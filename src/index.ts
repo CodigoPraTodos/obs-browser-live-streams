@@ -51,6 +51,9 @@ const publisher: EventPublisher = {
 const gitCpt = new GitPoller("CodigoPraTodos", publisher);
 gitCpt.startPoll();
 
+const gitMicrosoft = new GitPoller("Microsoft", publisher);
+gitMicrosoft.startPoll();
+
 wss.on("connection", (ws, _request) => {
     const clientId = ++clientsId;
     clientsMap.set(clientId, ws);
@@ -63,7 +66,7 @@ wss.on("connection", (ws, _request) => {
         clientsMap.delete(clientId);
     });
 
-    gitCpt.publishLast();
+    gitMicrosoft.publishLast();
 });
 
 server.listen(config.app.port, () => {

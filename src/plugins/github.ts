@@ -56,7 +56,7 @@ const getEventTypeVerb = (type: string): string => {
 const eventToHtml = (event: GitEvent): string => `
     <span class="actor">${event.actor.display_login}</span>
     ${getEventTypeVerb(event.type)}
-    <span class="object">${event.repo.name}</span>
+    <span class="object">${event.repo.name}</span><br>
 `;
 
 const parseEvent = (event: GitEvent): Event => {

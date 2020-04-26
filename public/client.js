@@ -27,13 +27,24 @@ const connectWebSocket = () => {
     };
 
     ws.onerror = () => {
-        showMessage("WebSocket error");
+        showMessage("");
+        console.error("Ws Streaming error");
     };
     ws.onopen = () => {
-        showMessage("WebSocket connection established");
+        showMessage("");
+        console.info("Ws Streamer Connected!");
     };
     ws.onclose = () => {
-        showMessage("WebSocket connection closed");
+        showMessage("");
+        console.info("Ws Streamer Closed!");
         ws = null;
     };
 };
+
+const autoConnection = () => {
+    if (!ws) {
+        connectWebSocket();
+    }
+};
+
+setInterval(autoConnection, 1000);

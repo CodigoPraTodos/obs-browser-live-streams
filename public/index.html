@@ -10,6 +10,7 @@
                 font-size: 48px;
                 font-family: monospace;
                 text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+                line-height: 38px;
             }
 
             .actor {
@@ -23,10 +24,16 @@
             .object {
                 color: #488fed;
             }
+
+            .message small {
+                font-size: 38px;
+                color: #ccc;
+                text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+            }
         </style>
     </head>
 
-    <body onload="connectWebSocket()">
+    <body>
         <div id="message" class="message">
             <span class="actor">leordev</span>
             starred project
