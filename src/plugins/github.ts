@@ -17,8 +17,25 @@ export interface GitRepo {
     name: string;
 }
 
+export interface GitCommit {
+    message: string;
+    sha: string;
+}
+
+export interface GitIssue {
+    number?: number;
+    title?: string;
+    body?: string;
+}
+
 export interface GitPayload {
-    action: string;
+    action?: string;
+    commits?: GitCommit[];
+    issue?: GitIssue;
+    author?: {
+        name: string;
+        email: string;
+    };
 }
 
 export interface GitEvent {
@@ -48,16 +65,48 @@ const getEventTypeVerb = (type: string): string => {
             return "just starred";
         case "PushEvent":
             return "pushed to";
+        case "IssuesEvent":
+        case "IssueCommentEvent":
+            return "updated issue on";
         default:
             return type;
     }
 };
 
-const eventToHtml = (event: GitEvent): string => `
+const getEventDetails = (event: GitEvent): string => {
+    switch (event.type) {
+        case "PushEvent": {
+            const { commits } = event.payload;
+            if (commits && commits.length > 0) {
+                return commits[0].message;
+            }
+            return "";
+        }
+        case "IssuesEvent":
+        case "IssueCommentEvent": {
+            const { issue } = event.payload;
+            if (issue) {
+                return `#${issue.number} - ${issue.title}`;
+            }
+            return "";
+        }
+        default:
+            return "";
+    }
+};
+
+const eventToHtml = (event: GitEvent): string => {
+    console.info(JSON.stringify(event.payload));
+
+    const details = getEventDetails(event);
+
+    return `
     <span class="actor">${event.actor.display_login}</span>
     ${getEventTypeVerb(event.type)}
     <span class="object">${event.repo.name}</span><br>
-`;
+    ${details ? `<small>${details}</small>` : ""}
+    `;
+};
 
 const parseEvent = (event: GitEvent): Event => {
     return {

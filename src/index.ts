@@ -66,7 +66,7 @@ wss.on("connection", (ws, _request) => {
         clientsMap.delete(clientId);
     });
 
-    gitMicrosoft.publishLast();
+    gitCpt.publishLast();
 });
 
 server.listen(config.app.port, () => {

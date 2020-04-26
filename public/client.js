@@ -1,14 +1,14 @@
-const messages = document.querySelector("#message");
+const messageContentDiv = document.getElementById("message-content");
 
 const showMessage = (message) => {
     try {
         const messageObj = JSON.parse(message);
         if (messageObj && messageObj.html) {
-            messages.innerHTML = messageObj.html;
+            messageContentDiv.innerHTML = messageObj.html;
         }
     } catch (_) {
-        messages.textContent = `${message}`;
-        messages.scrollTop = messages.scrollHeight;
+        messageContentDiv.textContent = `${message}`;
+        messageContentDiv.scrollTop = messageContentDiv.scrollHeight;
     }
 };
 
