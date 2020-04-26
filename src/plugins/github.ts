@@ -80,7 +80,7 @@ const getEventDetails = (event: GitEvent): string => {
         case "PushEvent": {
             const { commits } = event.payload;
             if (commits && commits.length > 0) {
-                return commits[0].message;
+                return commits[commits.length - 1].message;
             }
             return "";
         }
