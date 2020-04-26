@@ -1,3 +1,3 @@
-# git-streams
+# obs-browser-live-streams
 
-coleta mensagens do git e printa no html automatico com websockets
+Automatiza mensagens e printa no html com websockets para ser usado por exemplo no OBS Browser.
