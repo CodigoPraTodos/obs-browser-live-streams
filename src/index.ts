@@ -12,7 +12,7 @@ const logger = require("pino")();
 // import logger from "./logger";
 import routes from "./routes";
 import config from "./config";
-import { GitPoller } from "./plugins/github";
+import { GitPolling } from "./plugins/github";
 import { EventPublisher } from "./interfaces";
 
 const app: express.Application = express();
@@ -48,10 +48,10 @@ const publisher: EventPublisher = {
     publish: (event) => clientsMap.forEach((ws) => ws.send(JSON.stringify(event))),
 };
 
-const gitCpt = new GitPoller("CodigoPraTodos", publisher);
+const gitCpt = new GitPolling("CodigoPraTodos", publisher);
 gitCpt.startPoll();
 
-const gitMicrosoft = new GitPoller("Microsoft", publisher);
+const gitMicrosoft = new GitPolling("Microsoft", publisher);
 gitMicrosoft.startPoll();
 
 wss.on("connection", (ws, _request) => {

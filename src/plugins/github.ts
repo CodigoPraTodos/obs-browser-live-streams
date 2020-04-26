@@ -98,10 +98,7 @@ const getEventDetails = (event: GitEvent): string => {
 };
 
 const eventToHtml = (event: GitEvent): string => {
-    console.info(JSON.stringify(event.payload));
-
     const details = getEventDetails(event);
-
     return `
     <span class="actor">${event.actor.display_login}</span>
     ${getEventTypeVerb(event.type)}
@@ -118,7 +115,7 @@ const parseEvent = (event: GitEvent): Event => {
     };
 };
 
-export class GitPoller {
+export class GitPolling {
     private events: GitEvent[] = [];
 
     constructor(private user: string, private publisher: EventPublisher) {
