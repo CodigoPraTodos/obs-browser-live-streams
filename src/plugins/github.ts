@@ -59,7 +59,7 @@ const getEvents = async (user: string): Promise<GitEvent[]> => {
     return data.reverse();
 };
 
-// TODO: refactor verb + details, and cover more possibilities from:
+// TODO: refactor verb + details, and cover more possibilities from
 // https://developer.github.com/v3/activity/events/types/
 const getEventTypeVerb = (type: string): string => {
     switch (type) {
