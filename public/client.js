@@ -1,4 +1,10 @@
 const messageContentDiv = document.getElementById("message-content");
+const notificationSound = "that-was-quick.mp3";
+
+const playSound = () => {
+    const audio = new Audio(notificationSound);
+    audio.play();
+};
 
 const showMessage = (message) => {
     try {
@@ -10,6 +16,7 @@ const showMessage = (message) => {
         messageContentDiv.textContent = `${message}`;
         messageContentDiv.scrollTop = messageContentDiv.scrollHeight;
     }
+    playSound();
 };
 
 let ws;
