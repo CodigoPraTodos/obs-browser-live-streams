@@ -21,11 +21,12 @@
             }
         </style>
     </head>
-    <body>
-        <div class="message">
+    <body onload="connectWebSocket()">
+        <div id="message" class="message">
             <span class="actor">leordev</span>
             starred project
             <span class="project">CodigoPraTodos/git-streams</span>
         </div>
+        <script src="client.js"></script>
     </body>
 </html>
