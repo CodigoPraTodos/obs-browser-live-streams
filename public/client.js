@@ -1,8 +1,15 @@
 const messages = document.querySelector("#message");
 
 const showMessage = (message) => {
-    messages.textContent = `\n${message}`;
-    messages.scrollTop = messages.scrollHeight;
+    try {
+        const messageObj = JSON.parse(message);
+        if (messageObj && messageObj.html) {
+            messages.innerHTML = messageObj.html;
+        }
+    } catch (_) {
+        messages.textContent = `${message}`;
+        messages.scrollTop = messages.scrollHeight;
+    }
 };
 
 let ws;

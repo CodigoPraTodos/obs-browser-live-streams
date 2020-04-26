@@ -12,6 +12,8 @@ const logger = require("pino")();
 // import logger from "./logger";
 import routes from "./routes";
 import config from "./config";
+import { GitPoller } from "./plugins/github";
+import { EventPublisher } from "./interfaces";
 
 const app: express.Application = express();
 app.locals.name = config.app.name;
@@ -33,7 +35,7 @@ app.use("/", routes);
 
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
-const clientsMap = new Map();
+const clientsMap = new Map<number, WebSocket>();
 let clientsId = 0;
 
 server.on("upgrade", (request, socket, head) => {
@@ -46,21 +48,23 @@ wss.on("connection", (ws, _request) => {
     const clientId = ++clientsId;
     clientsMap.set(clientId, ws);
 
-    const clientTimer = setInterval(() => {
-        ws.send("test random number " + Math.round(Math.random() * 1000));
-    }, 1500);
-
     ws.on("message", function (message) {
         console.log(`Received message ${message} from client ${clientId}`);
     });
 
     ws.on("close", () => {
-        clearInterval(clientTimer);
         clientsMap.delete(clientId);
     });
 
     ws.send("welcome to the ws server, you are " + clientId);
 });
+
+const publisher: EventPublisher = {
+    publish: (event) => clientsMap.forEach((ws) => ws.send(JSON.stringify(event))),
+};
+
+const gitCpt = new GitPoller("CodigoPraTodos", publisher);
+gitCpt.startPoll();
 
 server.listen(config.app.port, () => {
     logger.info(`Servidor rodando em http://${config.app.host}:${config.app.port}`);
