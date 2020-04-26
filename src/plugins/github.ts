@@ -31,7 +31,7 @@ export interface GitEvent {
 }
 
 const eventToString = (event: GitEvent): string =>
-    `${event.created_at} ${event.id} - ${event.actor.display_login} >> ${event.type} >> ${event.repo.name}`;
+    `GIT: ${event.created_at} ${event.id} - ${event.actor.display_login} >> ${event.type} >> ${event.repo.name}`;
 
 const getEvents = async (user: string): Promise<GitEvent[]> => {
     console.info(`getting git events.. for ${user}`);
@@ -40,6 +40,31 @@ const getEvents = async (user: string): Promise<GitEvent[]> => {
     const response = await fetch(endpoint, { headers });
     const data: GitEvent[] = await response.json();
     return data.reverse();
+};
+
+const getEventTypeVerb = (type: string): string => {
+    switch (type) {
+        case "WatchEvent":
+            return "just starred";
+        case "PushEvent":
+            return "pushed to";
+        default:
+            return type;
+    }
+};
+
+const eventToHtml = (event: GitEvent): string => `
+    <span class="actor">${event.actor.display_login}</span>
+    ${getEventTypeVerb(event.type)}
+    <span class="object">${event.repo.name}</span>
+`;
+
+const parseEvent = (event: GitEvent): Event => {
+    return {
+        plugin: "git",
+        raw: event,
+        html: eventToHtml(event),
+    };
 };
 
 export class GitPoller {
@@ -56,23 +81,22 @@ export class GitPoller {
         setTimeout(this.startPoll, 5000);
     }
 
+    public publishLast(): void {
+        if (this.events.length) {
+            const event = parseEvent(this.events[this.events.length - 1]);
+            this.publisher.publish(event);
+        }
+    }
+
     private updateEvents(newEvents: GitEvent[]): void {
         for (const newEvent of newEvents) {
             const existingEvent = this.events.find((e) => e.id === newEvent.id);
             if (!existingEvent) {
                 console.info(eventToString(newEvent));
                 this.events.push(newEvent);
-                const event = this.parseEvent(newEvent);
+                const event = parseEvent(newEvent);
                 this.publisher.publish(event);
             }
         }
-    }
-
-    private parseEvent(event: GitEvent): Event {
-        return {
-            plugin: "git",
-            raw: event,
-            html: eventToString(event),
-        };
     }
 }

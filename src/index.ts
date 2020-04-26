@@ -44,6 +44,13 @@ server.on("upgrade", (request, socket, head) => {
     });
 });
 
+const publisher: EventPublisher = {
+    publish: (event) => clientsMap.forEach((ws) => ws.send(JSON.stringify(event))),
+};
+
+const gitCpt = new GitPoller("CodigoPraTodos", publisher);
+gitCpt.startPoll();
+
 wss.on("connection", (ws, _request) => {
     const clientId = ++clientsId;
     clientsMap.set(clientId, ws);
@@ -56,15 +63,8 @@ wss.on("connection", (ws, _request) => {
         clientsMap.delete(clientId);
     });
 
-    ws.send("welcome to the ws server, you are " + clientId);
+    gitCpt.publishLast();
 });
-
-const publisher: EventPublisher = {
-    publish: (event) => clientsMap.forEach((ws) => ws.send(JSON.stringify(event))),
-};
-
-const gitCpt = new GitPoller("CodigoPraTodos", publisher);
-gitCpt.startPoll();
 
 server.listen(config.app.port, () => {
     logger.info(`Servidor rodando em http://${config.app.host}:${config.app.port}`);
