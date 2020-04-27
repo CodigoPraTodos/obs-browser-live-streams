@@ -18,7 +18,7 @@ cp .env.example .env
 yarn dev
 ```
 
-Acesse http://localhost:3334
+Acesse http://localhost:3334 - esse é o endereço a ser adicionado no seu OBS, no componente Browser!
 
 ## Iniciativa de Código Livre da Comunidade CPT
 
