@@ -1,7 +1,5 @@
 # OBS Browser Live Streams
 
-[Read in English](README.en.md)
-
 ![obs-browser-live-streams.gif](obs-browser-live-streams.gif)
 
 Notifica mensagens de qualquer API e printa em real-tome com Websockets. Começamos com GitHub mas pode ser expandido para qualquer API (Spotify Playing Now, Notícias, Mercado Financeiro, Clima etc.)
