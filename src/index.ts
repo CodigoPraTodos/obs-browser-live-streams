@@ -51,8 +51,8 @@ const publisher: EventPublisher = {
 const gitCpt = new GitPolling("CodigoPraTodos", publisher);
 gitCpt.startPoll();
 
-const gitMicrosoft = new GitPolling("Microsoft", publisher);
-gitMicrosoft.startPoll();
+// const gitMicrosoft = new GitPolling("Microsoft", publisher);
+// gitMicrosoft.startPoll();
 
 wss.on("connection", (ws, _request) => {
     const clientId = ++clientsId;
