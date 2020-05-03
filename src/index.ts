@@ -9,11 +9,12 @@ import WebSocket from "ws";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const logger = require("pino")();
 
-// import logger from "./logger";
 import routes from "./routes";
 import config from "./config";
-import { GitPolling } from "./plugins/github";
-import { EventPublisher } from "./interfaces";
+import fetchGitEvents from "./providers/git";
+import fetchSpotifyNow from "./providers/spotify";
+import { makeManager, streamNextEvent, StreamEventManager } from "./events/manager";
+import { initiateProvider } from "./events/provider";
 
 const app: express.Application = express();
 app.locals.name = config.app.name;
@@ -37,6 +38,7 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 const clientsMap = new Map<number, WebSocket>();
 let clientsId = 0;
+let streamManager: StreamEventManager;
 
 server.on("upgrade", (request, socket, head) => {
     wss.handleUpgrade(request, socket, head, function (ws) {
@@ -44,15 +46,22 @@ server.on("upgrade", (request, socket, head) => {
     });
 });
 
-const publisher: EventPublisher = {
-    publish: (event) => clientsMap.forEach((ws) => ws.send(JSON.stringify(event))),
+const startStreaming = (): void => {
+    const event = streamNextEvent(streamManager);
+    if (event) {
+        console.info(`streaming >>> ${JSON.stringify(event.html)}`);
+        clientsMap.forEach((ws) => ws.send(JSON.stringify(event)));
+    }
 };
 
-const gitCpt = new GitPolling("CodigoPraTodos", publisher);
-gitCpt.startPoll();
+const initProviders = async (): Promise<void> => {
+    const gitCpt = await initiateProvider(() => fetchGitEvents("CodigoPraTodos"));
+    const spotifyNow = await initiateProvider(() => fetchSpotifyNow());
+    streamManager = makeManager([gitCpt, spotifyNow]);
+    setInterval(startStreaming, config.streaming.intervalMs);
+};
 
-// const gitMicrosoft = new GitPolling("Microsoft", publisher);
-// gitMicrosoft.startPoll();
+initProviders();
 
 wss.on("connection", (ws, _request) => {
     const clientId = ++clientsId;
@@ -65,8 +74,6 @@ wss.on("connection", (ws, _request) => {
     ws.on("close", () => {
         clientsMap.delete(clientId);
     });
-
-    gitCpt.publishLast();
 });
 
 server.listen(config.app.port, () => {
