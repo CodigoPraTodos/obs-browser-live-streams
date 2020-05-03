@@ -24,18 +24,18 @@ Acesse http://localhost:3334 - esse é o endereço a ser adicionado no seu OBS, 
 
 ```yml
 # objetos que precisamos
-EventProvider:
-  newEvents: lista de novos eventos
-  oldEvents: lista de eventos passados
+# EventProvider:
+#   newEvents: lista de novos eventos
+#   oldEvents: lista de eventos passados
 
 EventManager:
-  providers: lista de event providers
+    providers: lista de event providers
 
-# funcionalidades 
-main: 
-  - registrar os event providers no EventManager
-  - ativar um interval pra cada provider fazer o fetch de eventos
-  - iniciar um loop que a cada X segundos, pega o proximo evento do proximo provider (circular)
+# funcionalidades
+main:
+    - registrar os event providers no EventManager
+    - ativar um interval pra cada provider fazer o fetch de eventos
+    - iniciar um loop que a cada X segundos, pega o proximo evento do proximo provider (circular)
 fetchEvents(EventProvider): ler api e adicionar novos eventos se existirem
 nextEvent(EventProvider): pegar o proximo evento da lista de novos eventos e mover para eventos antigos
 ```
