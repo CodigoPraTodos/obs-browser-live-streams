@@ -33,10 +33,10 @@ EventManager:
 
 # funcionalidades
 main:
-    - registrar os event providers no EventManager
-    - ativar um interval pra cada provider fazer o fetch de eventos
+    # - registrar os event providers no EventManager
+    # - ativar um interval pra cada provider fazer o fetch de eventos
     - iniciar um loop que a cada X segundos, pega o proximo evento do proximo provider (circular)
-fetchEvents(EventProvider): ler api e adicionar novos eventos se existirem
+# fetchEvents(EventProvider): ler api e adicionar novos eventos se existirem
 nextEvent(EventProvider): pegar o proximo evento da lista de novos eventos e mover para eventos antigos
 ```
 

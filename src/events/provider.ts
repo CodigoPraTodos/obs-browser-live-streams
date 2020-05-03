@@ -26,6 +26,14 @@ const filterNewEvents = <T>(
     return newEvents;
 };
 
-// export const anyFetcher = jest.fn(async (provider: EventProvider<AnyEvent>): Promise => {
-//     provider.newEvents.push(makeEvent(exampleEvent.id, "bla", exampleEvent));
-// });
+export const initiateProvider = async <T>(
+    fetcher: () => Promise<StreamEvent<T>[]>,
+): Promise<EventProvider<T>> => {
+    const provider: EventProvider<T> = {
+        newEvents: [],
+        pastEvents: [],
+    };
+    await fetchEvents(provider, fetcher);
+    setInterval(async () => await fetchEvents(provider, fetcher), 5000);
+    return provider;
+};

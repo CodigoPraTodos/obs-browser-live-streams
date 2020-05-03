@@ -14,6 +14,9 @@ import routes from "./routes";
 import config from "./config";
 import { GitPolling } from "./plugins/github";
 import { EventPublisher } from "./interfaces";
+import fetchGitEvents from "./providers/git";
+import { makeManager } from "./events/manager";
+import { initiateProvider } from "./events/provider";
 
 const app: express.Application = express();
 app.locals.name = config.app.name;
@@ -43,6 +46,12 @@ server.on("upgrade", (request, socket, head) => {
         wss.emit("connection", ws, request);
     });
 });
+
+const initProviders = async (): Promise<void> => {
+    const gitMicrosoft = await initiateProvider(() => fetchGitEvents("Microsoft"));
+    makeManager([gitMicrosoft]);
+};
+initProviders();
 
 const publisher: EventPublisher = {
     publish: (event) => clientsMap.forEach((ws) => ws.send(JSON.stringify(event))),
