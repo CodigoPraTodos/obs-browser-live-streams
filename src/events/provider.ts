@@ -5,6 +5,18 @@ export interface EventProvider<T> {
     pastEvents: StreamEvent<T>[];
 }
 
+export const initiateProvider = async <T>(
+    fetcher: () => Promise<StreamEvent<T>[]>,
+): Promise<EventProvider<T>> => {
+    const provider: EventProvider<T> = {
+        newEvents: [],
+        pastEvents: [],
+    };
+    await fetchEvents(provider, fetcher);
+    setInterval(async () => await fetchEvents(provider, fetcher), 5000);
+    return provider;
+};
+
 export const fetchEvents = async <T>(
     provider: EventProvider<T>,
     fetcher: () => Promise<StreamEvent<T>[]>,
@@ -13,6 +25,14 @@ export const fetchEvents = async <T>(
     const newEvents = filterNewEvents(provider, events);
     provider.newEvents = provider.newEvents.concat(newEvents);
     return Promise.resolve();
+};
+
+export const getNextEvent = <T>(provider: EventProvider<T>): StreamEvent<T> | undefined => {
+    const next = provider.newEvents.shift();
+    if (next) {
+        provider.pastEvents.push(next);
+    }
+    return next;
 };
 
 const filterNewEvents = <T>(
@@ -24,16 +44,4 @@ const filterNewEvents = <T>(
         (event) => !existingEvents.find((currentEvent) => currentEvent.id === event.id),
     );
     return newEvents;
-};
-
-export const initiateProvider = async <T>(
-    fetcher: () => Promise<StreamEvent<T>[]>,
-): Promise<EventProvider<T>> => {
-    const provider: EventProvider<T> = {
-        newEvents: [],
-        pastEvents: [],
-    };
-    await fetchEvents(provider, fetcher);
-    setInterval(async () => await fetchEvents(provider, fetcher), 5000);
-    return provider;
 };

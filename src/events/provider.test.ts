@@ -1,5 +1,5 @@
 import { AnyEvent, exampleEvent } from "./__mocks";
-import { EventProvider, fetchEvents } from "./provider";
+import { EventProvider, fetchEvents, getNextEvent } from "./provider";
 import { makeEvent, StreamEvent } from "./stream-event";
 
 describe("event providers", () => {
@@ -12,7 +12,8 @@ describe("event providers", () => {
             pastEvents: [],
         };
 
-        anyEventFetcher = (): Promise<StreamEvent<AnyEvent>[]> => Promise.resolve([makeEvent(1, "test", exampleEvent)]);
+        anyEventFetcher = (): Promise<StreamEvent<AnyEvent>[]> =>
+            Promise.resolve([makeEvent(1, "test", exampleEvent)]);
     });
 
     it("verifies that a provider has a list of new and past events", () => {
@@ -49,5 +50,22 @@ describe("event providers", () => {
 
         await fetchEvents(provider, () => Promise.resolve([makeEvent(2, "test2", exampleEvent)]));
         expect(provider.newEvents.length).toEqual(2);
+    });
+
+    it("gets the next element from the new events and move to the past events", () => {
+        const e1 = makeEvent(1, "test2", exampleEvent);
+        const e2 = makeEvent(2, "test2", exampleEvent);
+        provider = {
+            newEvents: [e1, e2],
+            pastEvents: [],
+        };
+
+        expect(getNextEvent(provider)).toEqual(e1);
+        expect(provider.newEvents).toEqual([e2]);
+        expect(provider.pastEvents).toEqual([e1]);
+
+        expect(getNextEvent(provider)).toEqual(e2);
+        expect(provider.newEvents).toEqual([]);
+        expect(provider.pastEvents).toEqual([e1, e2]);
     });
 });
