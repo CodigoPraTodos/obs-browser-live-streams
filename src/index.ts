@@ -12,6 +12,7 @@ const logger = require("pino")();
 import routes from "./routes";
 import config from "./config";
 import fetchGitEvents from "./providers/git";
+import fetchSpotifyNow from "./providers/spotify";
 import { makeManager, streamNextEvent } from "./events/manager";
 import { initiateProvider } from "./events/provider";
 
@@ -46,7 +47,8 @@ server.on("upgrade", (request, socket, head) => {
 
 const initProviders = async (): Promise<void> => {
     const gitCpt = await initiateProvider(() => fetchGitEvents("CodigoPraTodos"));
-    const manager = makeManager([gitCpt]);
+    const spotifyNow = await initiateProvider(() => fetchSpotifyNow());
+    const manager = makeManager([gitCpt, spotifyNow]);
 
     setInterval(() => {
         const event = streamNextEvent(manager);

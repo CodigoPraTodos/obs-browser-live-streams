@@ -12,6 +12,10 @@ const git = {
     token: process.env.GIT_TOKEN,
 };
 
+const spotify = {
+    token: process.env.SPOTIFY_TOKEN,
+};
+
 // TODO: convert to env
 const logging = {
     dir: "logs",
@@ -25,4 +29,5 @@ export default {
     app,
     logging,
     git,
+    spotify,
 };

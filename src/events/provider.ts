@@ -24,7 +24,6 @@ export const fetchEvents = async <T>(
     const events = await fetcher();
     const newEvents = filterNewEvents(provider, events);
     provider.newEvents = provider.newEvents.concat(newEvents);
-    return Promise.resolve();
 };
 
 export const getNextEvent = <T>(provider: EventProvider<T>): StreamEvent<T> | undefined => {
