@@ -13,7 +13,7 @@ import routes from "./routes";
 import config from "./config";
 import fetchGitEvents from "./providers/git";
 import fetchSpotifyNow from "./providers/spotify";
-import { makeManager, streamNextEvent } from "./events/manager";
+import { makeManager, streamNextEvent, StreamEventManager } from "./events/manager";
 import { initiateProvider } from "./events/provider";
 
 const app: express.Application = express();
@@ -38,6 +38,7 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 const clientsMap = new Map<number, WebSocket>();
 let clientsId = 0;
+let streamManager: StreamEventManager;
 
 server.on("upgrade", (request, socket, head) => {
     wss.handleUpgrade(request, socket, head, function (ws) {
@@ -45,19 +46,21 @@ server.on("upgrade", (request, socket, head) => {
     });
 });
 
+const startStreaming = (): void => {
+    const event = streamNextEvent(streamManager);
+    if (event) {
+        console.info(`streaming >>> ${JSON.stringify(event.html)}`);
+        clientsMap.forEach((ws) => ws.send(JSON.stringify(event)));
+    }
+};
+
 const initProviders = async (): Promise<void> => {
     const gitCpt = await initiateProvider(() => fetchGitEvents("CodigoPraTodos"));
     const spotifyNow = await initiateProvider(() => fetchSpotifyNow());
-    const manager = makeManager([gitCpt, spotifyNow]);
-
-    setInterval(() => {
-        const event = streamNextEvent(manager);
-        if (event) {
-            console.info(`streaming >>> ${JSON.stringify(event.html)}`);
-            clientsMap.forEach((ws) => ws.send(JSON.stringify(event)));
-        }
-    }, 5000);
+    streamManager = makeManager([gitCpt, spotifyNow]);
+    setInterval(startStreaming, config.streaming.intervalMs);
 };
+
 initProviders();
 
 wss.on("connection", (ws, _request) => {

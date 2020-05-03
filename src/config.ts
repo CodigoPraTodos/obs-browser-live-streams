@@ -8,8 +8,13 @@ const app = {
     environment: "development",
 };
 
+const streaming = {
+    intervalMs: 5000,
+};
+
 const git = {
     token: process.env.GIT_TOKEN,
+    eventsPageSize: 5,
 };
 
 const spotify = {
@@ -30,4 +35,5 @@ export default {
     logging,
     git,
     spotify,
+    streaming,
 };
