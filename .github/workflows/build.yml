@@ -1,0 +1,42 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+    push:
+        branches: [master]
+    pull_request:
+        branches: [master]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+    # This workflow contains a single job called "build"
+    build:
+        name: ${{ matrix.os }} ${{ matrix.version }}
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [ubuntu-16.04]
+                version: ["1.39.2"]
+
+        # Steps represent a sequence of tasks that will be executed as part of the job
+        steps:
+            # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+            - uses: actions/checkout@v2
+
+            - name: ➡️ Setup Node
+              uses: actions/setup-node@v1.4.2
+              with:
+                  always-auth: false
+                  node-version: 12.x
+
+            - name: 📦 Install Node Dependencies
+              run: yarn
+
+            - name: 🛠 Lint and Build
+              run: yarn lint && yarn build
+
+            - name: 🧪 Run Tests
+              run: yarn test

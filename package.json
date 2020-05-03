@@ -5,7 +5,7 @@
     "license": "MIT",
     "scripts": {
         "build": "rm -rf build && tsc -p tsconfig.json",
-        "lint": "tsc --noEmit && eslint 'src/**/*.{js,ts}' --quiet --fix",
+        "lint": "tsc --noEmit && eslint 'src/**/*.{js,ts}'",
         "test": "jest",
         "start": "NODE_ENV=production node ./build/index.js",
         "dev": "ts-node-dev --respawn --transpileOnly ./src/index.ts",
