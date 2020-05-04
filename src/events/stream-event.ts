@@ -9,9 +9,3 @@ export const makeEvent = <T>(id: string | number, html: string, raw: T): StreamE
     html,
     raw,
 });
-
-export const makeSimpleEvent = (id: string | number): StreamEvent<string | number> => ({
-    id: `${id}`,
-    html: `${id}`,
-    raw: id,
-});

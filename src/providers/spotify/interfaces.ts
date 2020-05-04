@@ -6,18 +6,19 @@ export interface SpotifyPlayingNowEvent {
 }
 
 export interface SpotifyPlayingApi {
-    error: any;
     is_playing: boolean;
     item: {
         id: string;
         name: string;
         album: {
-            images: {
+            images: Array<{
                 url: string;
-            }[];
+            }>;
         };
-        artists: {
+        artists: Array<{
             name: string;
-        }[];
+        }>;
     };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    error: any;
 }

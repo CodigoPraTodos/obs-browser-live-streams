@@ -1,6 +1,6 @@
-import { registerProvider, makeManager, streamNextEvent } from "./manager";
+import { makeManager, streamNextEvent } from "./manager";
 import { EventProvider } from "./provider";
-import { makeSimpleEvent } from "./stream-event";
+import { AnyEvent, makeAnyEvent } from "./__mocks";
 
 describe("stream events", () => {
     it("creates a StreamEventManager", () => {
@@ -14,18 +14,17 @@ describe("stream events", () => {
     });
 
     it("allows the registration of new Providers", () => {
-        const manager = makeManager([]);
-        const anyProvider: EventProvider<any> = {
+        const anyProvider: EventProvider<AnyEvent> = {
             newEvents: [],
             pastEvents: [],
         };
-        registerProvider(manager, anyProvider);
+        const manager = makeManager([anyProvider]);
         expect(manager.providers).toHaveLength(1);
     });
 
     it("retrieves the next event from the same provider", () => {
-        const provider1: EventProvider<any> = {
-            newEvents: [makeSimpleEvent(1), makeSimpleEvent(2)],
+        const provider1: EventProvider<AnyEvent> = {
+            newEvents: [makeAnyEvent(1), makeAnyEvent(2)],
             pastEvents: [],
         };
         const manager = makeManager([provider1]);
@@ -35,13 +34,13 @@ describe("stream events", () => {
     });
 
     it("retrieves the next event from the next provider", () => {
-        const provider1: EventProvider<any> = {
-            newEvents: [makeSimpleEvent(1), makeSimpleEvent(2)],
+        const provider1: EventProvider<AnyEvent> = {
+            newEvents: [makeAnyEvent(1), makeAnyEvent(2)],
             pastEvents: [],
         };
 
-        const provider2: EventProvider<any> = {
-            newEvents: [makeSimpleEvent("a"), makeSimpleEvent("b")],
+        const provider2: EventProvider<AnyEvent> = {
+            newEvents: [makeAnyEvent("a"), makeAnyEvent("b")],
             pastEvents: [],
         };
 
@@ -58,13 +57,13 @@ describe("stream events", () => {
     });
 
     it("retrieves the next event for unbalanced providers", () => {
-        const provider1: EventProvider<any> = {
-            newEvents: [makeSimpleEvent(1)],
+        const provider1: EventProvider<AnyEvent> = {
+            newEvents: [makeAnyEvent(1)],
             pastEvents: [],
         };
 
-        const provider2: EventProvider<any> = {
-            newEvents: [makeSimpleEvent("a"), makeSimpleEvent("b"), makeSimpleEvent("c")],
+        const provider2: EventProvider<AnyEvent> = {
+            newEvents: [makeAnyEvent("a"), makeAnyEvent("b"), makeAnyEvent("c")],
             pastEvents: [],
         };
 
@@ -82,13 +81,13 @@ describe("stream events", () => {
     });
 
     it("retrieves the next event properly when updating the provider in the middle", () => {
-        const provider1: EventProvider<any> = {
-            newEvents: [makeSimpleEvent(1)],
+        const provider1: EventProvider<AnyEvent> = {
+            newEvents: [makeAnyEvent(1)],
             pastEvents: [],
         };
 
-        const provider2: EventProvider<any> = {
-            newEvents: [makeSimpleEvent("a"), makeSimpleEvent("b"), makeSimpleEvent("c")],
+        const provider2: EventProvider<AnyEvent> = {
+            newEvents: [makeAnyEvent("a"), makeAnyEvent("b"), makeAnyEvent("c")],
             pastEvents: [],
         };
 
@@ -100,7 +99,7 @@ describe("stream events", () => {
         expect(streamNextEvent(manager)?.id).toBe("b");
         expect(manager.lastPublishedProvider).toBe(1);
 
-        provider1.newEvents.push(makeSimpleEvent(2));
+        provider1.newEvents.push(makeAnyEvent(2));
         expect(streamNextEvent(manager)?.id).toBe("2");
         expect(manager.lastPublishedProvider).toBe(0);
 

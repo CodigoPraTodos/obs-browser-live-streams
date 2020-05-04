@@ -15,6 +15,8 @@ import fetchGitEvents from "./providers/git";
 import fetchSpotifyNow from "./providers/spotify";
 import { makeManager, streamNextEvent, StreamEventManager } from "./events/manager";
 import { initiateProvider } from "./events/provider";
+import { GitEvent } from "./providers/git/interfaces";
+import { SpotifyPlayingNowEvent } from "./providers/spotify/interfaces";
 
 const app: express.Application = express();
 app.locals.name = config.app.name;
@@ -22,7 +24,7 @@ app.locals.version = config.app.version;
 
 const ep = expressPino({
     logger,
-} as any);
+} as expressPino.Options);
 app.use(ep);
 app.use(cors());
 app.use(helmet());
@@ -38,7 +40,7 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ clientTracking: false, noServer: true });
 const clientsMap = new Map<number, WebSocket>();
 let clientsId = 0;
-let streamManager: StreamEventManager;
+let streamManager: StreamEventManager<GitEvent | SpotifyPlayingNowEvent>;
 
 server.on("upgrade", (request, socket, head) => {
     wss.handleUpgrade(request, socket, head, function (ws) {
@@ -55,15 +57,20 @@ const startStreaming = (): void => {
 };
 
 const initProviders = async (): Promise<void> => {
-    const gitCpt = await initiateProvider(() => fetchGitEvents("CodigoPraTodos"));
-    const spotifyNow = await initiateProvider(() => fetchSpotifyNow());
-    streamManager = makeManager([gitCpt, spotifyNow]);
+    try {
+        const gitCpt = await initiateProvider(() => fetchGitEvents("CodigoPraTodos"));
+        const spotifyNow = await initiateProvider(fetchSpotifyNow);
+        streamManager = makeManager<GitEvent | SpotifyPlayingNowEvent>([gitCpt, spotifyNow]);
+    } catch (e) {
+        console.error("Fail to initialize Providers to Stream", e);
+        return process.exit(1);
+    }
     setInterval(startStreaming, config.streaming.intervalMs);
 };
 
 initProviders();
 
-wss.on("connection", (ws, _request) => {
+wss.on("connection", (ws) => {
     const clientId = ++clientsId;
     clientsMap.set(clientId, ws);
 

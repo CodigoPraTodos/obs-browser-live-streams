@@ -7,9 +7,17 @@ const GIT_AUTH_HEADER = `token ${config.git.token}`;
 
 export const gitEventsApi = async (user: string): Promise<GitEvent[]> => {
     console.info(`getting git events.. for ${user}`);
-    const endpoint = `${GIT_URL}users/${user}/events?per_page=${config.git.eventsPageSize}`;
-    const headers = { Authorization: GIT_AUTH_HEADER };
-    const response = await fetch(endpoint, { headers });
-    const data = await response.json();
-    return data.reverse();
+    try {
+        const endpoint = `${GIT_URL}users/${user}/events?per_page=${config.git.eventsPageSize}`;
+        const headers = { Authorization: GIT_AUTH_HEADER };
+        const response = await fetch(endpoint, { headers });
+        const data = await response.json();
+        return data.reverse();
+    } catch (error) {
+        console.error(
+            "Failure during Github Api Request - please check your token or network",
+            error,
+        );
+        throw error;
+    }
 };

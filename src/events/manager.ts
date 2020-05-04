@@ -1,27 +1,20 @@
 import { EventProvider, getNextEvent } from "./provider";
 import { StreamEvent } from "./stream-event";
 
-export interface StreamEventManager {
-    providers: EventProvider<any>[];
+export interface StreamEventManager<T> {
+    providers: EventProvider<T>[];
     lastPublishedProvider: number;
 }
 
-export const registerProvider = (
-    manager: StreamEventManager,
-    provider: EventProvider<any>,
-): void => {
-    manager.providers.push(provider);
-};
-
-export const makeManager = (providers: EventProvider<any>[]): StreamEventManager => ({
+export const makeManager = <T>(providers: EventProvider<T>[]): StreamEventManager<T> => ({
     providers,
     lastPublishedProvider: -1,
 });
 
-export const streamNextEvent = (manager: StreamEventManager): StreamEvent<any> | undefined => {
+export const streamNextEvent = <T>(manager: StreamEventManager<T>): StreamEvent<T> | undefined => {
     const totalProviders = manager.providers.length;
 
-    let nextEvent: StreamEvent<any> | undefined = undefined;
+    let nextEvent: StreamEvent<T> | undefined = undefined;
     let checks = 0;
     let index = manager.lastPublishedProvider + 1;
 

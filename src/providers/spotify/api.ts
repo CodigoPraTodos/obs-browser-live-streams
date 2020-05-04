@@ -9,10 +9,23 @@ export const spotifyCurrentListeningApi = async (): Promise<SpotifyPlayingNowEve
     console.info("getting spotify listening now");
     const headers = { Authorization: SPOTIFY_AUTH_HEADER };
     const response = await fetch(SPOTIFY_URL, { headers });
-    const data: SpotifyPlayingApi = await response.json();
 
+    // there's no current song (no content status 204)
+    if (response.status === 204) {
+        return undefined;
+    }
+
+    const data: SpotifyPlayingApi = await response.json();
+    return parseSpotifyEvent(data);
+};
+
+const parseSpotifyEvent = (data: SpotifyPlayingApi): SpotifyPlayingNowEvent | undefined => {
     const { item, is_playing, error } = data;
     if (error) {
+        console.error(
+            "Fail to get Spotify Playing Now API, please check your token or network",
+            error,
+        );
         throw error;
     }
 
