@@ -21,18 +21,8 @@ const spotify = {
     token: process.env.SPOTIFY_TOKEN,
 };
 
-// TODO: convert to env
-const logging = {
-    dir: "logs",
-    level: "debug",
-    maxSize: "20m",
-    maxFiles: "7d",
-    datePattern: "YYYY-MM-DD",
-};
-
 export default {
     app,
-    logging,
     git,
     spotify,
     streaming,
