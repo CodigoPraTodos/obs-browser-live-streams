@@ -44,7 +44,7 @@
         "express": "^4.17.1",
         "express-pino-logger": "^4.0.0",
         "helmet": "^3.22.0",
-        "node-fetch": "^2.6.0",
+        "node-fetch": "^2.6.1",
         "pino": "^6.2.0"
     }
 }
